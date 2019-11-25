@@ -1,3 +1,6 @@
+# configure user and email
+
+
 # check branch
 git branch 
 
