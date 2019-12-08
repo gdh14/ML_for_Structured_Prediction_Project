@@ -6,6 +6,7 @@ data:
     val_split: val
     img_rows: 'same'
     img_cols: 'same'
+<<<<<<< HEAD
     shrink_ratio: 0.02
     path: /Users/dgan/datasets/VOCdevkit/VOC2012/
     sbd_path: /private/home/meetshah/datasets/VOC/benchmark_RELEASE/
@@ -19,6 +20,21 @@ training:
         name: 'adam'
         lr: 1.0e-3
         weight_decay: 0.0005
+=======
+    path: /private/home/meetshah/datasets/VOC/060817/VOCdevkit/VOC2012/
+    sbd_path: /private/home/meetshah/datasets/VOC/benchmark_RELEASE/
+training:
+    train_iters: 300000
+    batch_size: 1
+    val_interval: 1000
+    n_workers: 16
+    print_interval: 50
+    optimizer:
+        name: 'sgd'
+        lr: 1.0e-10
+        weight_decay: 0.0005
+        momentum: 0.99
+>>>>>>> 15c1e3ecdabf3448dac071daffbf7a6aa2959ccb
     loss:
         name: 'cross_entropy'
         size_average: False

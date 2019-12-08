@@ -63,10 +63,8 @@ class pascalVOCLoader(data.Dataset):
         self.n_classes = 21
         self.mean = np.array([104.00699, 116.66877, 122.67892])
         self.files = collections.defaultdict(list)
-
         self.img_size = img_size if isinstance(img_size, tuple) else (img_size, img_size)
         self.shrink_ratio = shrink_ratio
-        # import pdb; pdb.set_trace()
 
         if not self.test_mode:
             for split in ["train", "val", "trainval"]:
@@ -78,14 +76,12 @@ class pascalVOCLoader(data.Dataset):
             self.setup_annotations()
             self.shrink_data()
 
-
         self.tf = transforms.Compose(
             [
                 transforms.ToTensor(),
                 transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225]),
             ]
         )
-
 
     def shrink_data(self):
         if self.shrink_ratio < 1:
@@ -105,7 +101,6 @@ class pascalVOCLoader(data.Dataset):
             im, lbl = self.augmentations(im, lbl)
         if self.is_transform:
             im, lbl = self.transform(im, lbl)
-        # import pdb; pdb.set_trace()
 
         return im, lbl
 

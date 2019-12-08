@@ -20,7 +20,6 @@ def get_model(model_dict, n_classes, version=None):
         model = model(n_classes, **param_dict)
 
     elif name in ["fcn32s", "fcn16s", "fcn8s"]:
-        # import pdb; pdb.set_trace()
         model = model(n_classes=n_classes, **param_dict)
         vgg16 = models.vgg16(pretrained=True)
         model.init_vgg16_params(vgg16)

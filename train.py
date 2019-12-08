@@ -92,7 +92,6 @@ def train(cfg, writer, logger):
     loss_fn = get_loss_function(cfg)
     logger.info("Using loss {}".format(loss_fn))
 
-
     start_iter = 0
     if cfg["training"]["resume"] is not None:
         if os.path.isfile(cfg["training"]["resume"]):
@@ -120,20 +119,14 @@ def train(cfg, writer, logger):
     i = start_iter
     flag = True
 
-
-    import pdb; pdb.set_trace()
-
     while i <= cfg["training"]["train_iters"] and flag:
-        
         train_loss_meter.reset()
-        
         for (images, labels) in train_loader:
             batch_size = images.size(0)
             i += 1
             start_ts = time.time()
             scheduler.step()
             model.train()
-
             images = images.to(device)
             labels = labels.to(device)
 
