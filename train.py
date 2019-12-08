@@ -7,6 +7,7 @@ import random
 import argparse
 import numpy as np
 
+from datetime import datetime
 from torch.utils import data
 from tqdm import tqdm
 
@@ -224,7 +225,7 @@ if __name__ == "__main__":
     with open(args.config) as fp:
         cfg = yaml.load(fp)
 
-    run_id = random.randint(1, 100000)
+    run_id = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
     logdir = os.path.join("runs", os.path.basename(args.config)[:-4], str(run_id))
     writer = SummaryWriter(log_dir=logdir)
 
