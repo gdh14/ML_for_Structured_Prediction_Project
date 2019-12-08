@@ -51,6 +51,7 @@ class pascalVOCLoader(data.Dataset):
         augmentations=None,
         img_norm=True,
         test_mode=False,
+        shrink_ratio=1,
     ):
         self.root = root
         self.sbd_path = sbd_path
@@ -62,17 +63,21 @@ class pascalVOCLoader(data.Dataset):
         self.n_classes = 21
         self.mean = np.array([104.00699, 116.66877, 122.67892])
         self.files = collections.defaultdict(list)
+
         self.img_size = img_size if isinstance(img_size, tuple) else (img_size, img_size)
+        self.shrink_ratio = shrink_ratio
+        # import pdb; pdb.set_trace()
 
         if not self.test_mode:
             for split in ["train", "val", "trainval"]:
                 path = pjoin(self.root, "ImageSets/Segmentation", split + ".txt")
                 file_list = tuple(open(path, "r"))
                 file_list = [id_.rstrip() for id_ in file_list]
-                # import pdb; pdb.set_trace()
                 self.files[split] = file_list
 
             self.setup_annotations()
+            self.shrink_data()
+
 
         self.tf = transforms.Compose(
             [
@@ -80,6 +85,12 @@ class pascalVOCLoader(data.Dataset):
                 transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225]),
             ]
         )
+
+
+    def shrink_data(self):
+        if self.shrink_ratio < 1:
+            for key in self.files:
+                self.files[key] = self.files[key][:int(len(self.files[key]) * self.shrink_ratio)]
 
     def __len__(self):
         return len(self.files[self.split])
@@ -90,13 +101,11 @@ class pascalVOCLoader(data.Dataset):
         lbl_path = pjoin(self.root, "SegmentationClass/pre_encoded", im_name + ".png")
         im = Image.open(im_path)
         lbl = Image.open(lbl_path)
-
-        import pdb; pdb.set_trace()
         if self.augmentations is not None:
             im, lbl = self.augmentations(im, lbl)
         if self.is_transform:
             im, lbl = self.transform(im, lbl)
-        import pdb; pdb.set_trace()
+        # import pdb; pdb.set_trace()
 
         return im, lbl
 

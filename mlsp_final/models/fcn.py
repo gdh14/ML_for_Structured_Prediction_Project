@@ -3,8 +3,8 @@ import functools
 import torch.nn as nn
 import torch.nn.functional as F
 
-from ptsemseg.models.utils import get_upsampling_weight
-from ptsemseg.loss import cross_entropy2d
+from mlsp_final.models.utils import get_upsampling_weight
+from mlsp_final.loss import cross_entropy2d
 
 
 # FCN32s
