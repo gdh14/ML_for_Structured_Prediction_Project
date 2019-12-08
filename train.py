@@ -11,13 +11,13 @@ from torch.utils import data
 from tqdm import tqdm
 
 from mlsp_final.models import get_model
-# from ptsemseg.loss import get_loss_function
+from mlsp_final.loss import get_loss_function
 from mlsp_final.loader import get_loader
 from mlsp_final.utils import get_logger
-# from ptsemseg.metrics import runningScore, averageMeter
-# from ptsemseg.augmentations import get_composed_augmentations
-# from ptsemseg.schedulers import get_scheduler
-# from ptsemseg.optimizers import get_optimizer
+from mlsp_final.metrics import runningScore, averageMeter
+from mlsp_final.augmentations import get_composed_augmentations
+from mlsp_final.schedulers import get_scheduler
+from mlsp_final.optimizers import get_optimizer
 
 from tensorboardX import SummaryWriter
 
@@ -47,6 +47,7 @@ def train(cfg, writer, logger):
         split=cfg["data"]["train_split"],
         img_size=(cfg["data"]["img_rows"], cfg["data"]["img_cols"]),
         augmentations=data_aug,
+        shrink_ratio=cfg["data"].get("shrink_ratio", 1)
     )
 
     v_loader = data_loader(
@@ -54,26 +55,29 @@ def train(cfg, writer, logger):
         is_transform=True,
         split=cfg["data"]["val_split"],
         img_size=(cfg["data"]["img_rows"], cfg["data"]["img_cols"]),
+        shrink_ratio=cfg["data"].get("shrink_ratio", 1)
     )
 
     n_classes = t_loader.n_classes
-    trainloader = data.DataLoader(
+    train_loader = data.DataLoader(
         t_loader,
         batch_size=cfg["training"]["batch_size"],
         num_workers=cfg["training"]["n_workers"],
         shuffle=True,
     )
 
-    valloader = data.DataLoader(
+    val_loader = data.DataLoader(
         v_loader, batch_size=cfg["training"]["batch_size"], num_workers=cfg["training"]["n_workers"]
     )
 
-    # Setup Metrics
+    logger.info("{} data for training".format(len(t_loader)))
+    logger.info("{} data for validation".format(len(v_loader)))
+
+    # Setup Metrics    
     running_metrics_val = runningScore(n_classes)
 
     # Setup Model
     model = get_model(cfg["model"], n_classes).to(device)
-
     model = torch.nn.DataParallel(model, device_ids=range(torch.cuda.device_count()))
 
     # Setup optimizer, lr_scheduler and loss function
@@ -108,6 +112,7 @@ def train(cfg, writer, logger):
             logger.info("No checkpoint found at '{}'".format(cfg["training"]["resume"]))
 
     val_loss_meter = averageMeter()
+    train_loss_meter = averageMeter()
     time_meter = averageMeter()
 
     best_iou = -100.0
@@ -115,7 +120,9 @@ def train(cfg, writer, logger):
     flag = True
 
     while i <= cfg["training"]["train_iters"] and flag:
-        for (images, labels) in trainloader:
+        train_loss_meter.reset()
+        for (images, labels) in train_loader:
+            batch_size = images.size(0)
             i += 1
             start_ts = time.time()
             scheduler.step()
@@ -132,13 +139,14 @@ def train(cfg, writer, logger):
             optimizer.step()
 
             time_meter.update(time.time() - start_ts)
+            train_loss_meter.update(loss.item(), batch_size)
 
             if (i + 1) % cfg["training"]["print_interval"] == 0:
                 fmt_str = "Iter [{:d}/{:d}]  Loss: {:.4f}  Time/Image: {:.4f}"
                 print_str = fmt_str.format(
                     i + 1,
                     cfg["training"]["train_iters"],
-                    loss.item(),
+                    train_loss_meter.avg,
                     time_meter.avg / cfg["training"]["batch_size"],
                 )
 
@@ -152,7 +160,7 @@ def train(cfg, writer, logger):
             ]:
                 model.eval()
                 with torch.no_grad():
-                    for i_val, (images_val, labels_val) in tqdm(enumerate(valloader)):
+                    for i_val, (images_val, labels_val) in tqdm(enumerate(val_loader)):
                         images_val = images_val.to(device)
                         labels_val = labels_val.to(device)
 

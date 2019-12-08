@@ -1,6 +1,7 @@
 import json
 
-from ptsemseg.loader.pascal_voc_loader import pascalVOCLoader
+from mlsp_final.loader.pascal_voc_loader import pascalVOCLoader
+from mlsp_final.loader.cityscapes_loader import cityscapesLoader
 
 def get_loader(name):
     """get_loader
@@ -9,4 +10,5 @@ def get_loader(name):
     """
     return {
         "pascal": pascalVOCLoader,
+        "citiscapes": cityscapesLoader,
     }[name]
