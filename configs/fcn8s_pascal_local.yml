@@ -1,0 +1,28 @@
+model:
+    arch: fcn8s
+data:
+    dataset: pascal
+    train_split: train_aug
+    val_split: val
+    img_rows: 'same'
+    img_cols: 'same'
+    shrink_ratio:
+        train_shrink_ratio: 0.01
+        val_shrink_ratio: 0.01
+    path: /Users/dgan/datasets/VOCdevkit/VOC2012/
+    sbd_path: /private/home/meetshah/datasets/VOC/benchmark_RELEASE/
+training:
+    train_iters: 300
+    batch_size: 1
+    val_interval: 2
+    n_workers: 4
+    print_interval: 2
+    optimizer:
+        name: 'adam'
+        lr: 1.0e-3
+        weight_decay: 0.0005
+    loss:
+        name: 'cross_entropy'
+        size_average: False
+    lr_schedule:
+    resume: fcn8s_pascal_best_model.pkl
