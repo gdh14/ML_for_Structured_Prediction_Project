@@ -51,7 +51,7 @@ class pascalVOCLoader(data.Dataset):
         augmentations=None,
         img_norm=True,
         test_mode=False,
-        shrink_ratio=1,
+        shrink_ratio=None,
     ):
         self.root = root
         self.sbd_path = sbd_path
@@ -74,7 +74,9 @@ class pascalVOCLoader(data.Dataset):
                 self.files[split] = file_list
 
             self.setup_annotations()
-            self.shrink_data()
+
+            if shrink_ratio is not None:
+                self.shrink_data()
 
         self.tf = transforms.Compose(
             [
@@ -84,9 +86,11 @@ class pascalVOCLoader(data.Dataset):
         )
 
     def shrink_data(self):
-        if self.shrink_ratio < 1:
-            for key in self.files:
-                self.files[key] = self.files[key][:int(len(self.files[key]) * self.shrink_ratio)]
+        for key in self.files:
+            if 'train' in key:
+                self.files[key] = self.files[key][:int(len(self.files[key]) * self.shrink_ratio['train_shrink_ratio'])]
+            else:
+                self.files[key] = self.files[key][:int(len(self.files[key]) * self.shrink_ratio['val_shrink_ratio'])]
 
     def __len__(self):
         return len(self.files[self.split])
@@ -110,6 +114,7 @@ class pascalVOCLoader(data.Dataset):
         else:
             img = img.resize((self.img_size[0], self.img_size[1]))  # uint8 with RGB mode
             lbl = lbl.resize((self.img_size[0], self.img_size[1]))
+        
         img = self.tf(img)
         lbl = torch.from_numpy(np.array(lbl)).long()
         lbl[lbl == 255] = 0
@@ -245,8 +250,8 @@ class pascalVOCLoader(data.Dataset):
 
 
 # Leave code for debugging purposes
-import ptsemseg.augmentations as aug
 if __name__ == '__main__':
+    import ptsemseg.augmentations as aug
     # local_path = '/home/meetshah1995/datasets/VOCdevkit/VOC2012/'
     local_path = '/Users/dgan/datasets/VOCdevkit/VOC2012/'
     bs = 1

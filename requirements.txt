@@ -1,0 +1,10 @@
+numpy==1.17.3
+matplotlib==2.2.2
+scipy==1.1.0
+torchvision==0.2.1
+tqdm==4.28.1
+torch
+pydensecrf
+protobuf==3.8.0
+tensorboardX
+nvidia-ml-py3
