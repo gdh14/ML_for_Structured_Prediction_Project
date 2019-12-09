@@ -2,12 +2,6 @@ import copy
 import torchvision.models as models
 
 from mlsp_final.models.fcn import fcn8s, fcn16s, fcn32s
-from mlsp_final.models.segnet import segnet
-from mlsp_final.models.unet import unet
-from mlsp_final.models.pspnet import pspnet
-from mlsp_final.models.icnet import icnet
-from mlsp_final.models.linknet import linknet
-from mlsp_final.models.frrn import frrn
 
 
 def get_model(model_dict, n_classes, version=None):
