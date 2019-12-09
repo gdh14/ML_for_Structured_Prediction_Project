@@ -1,6 +1,7 @@
 # configure user and email
 
-
+git config --global user.name "yy1203"
+git config --global user.email "yangyu2@andrew.cmu.edu"
 # check branch
 git branch 
 
@@ -13,11 +14,20 @@ git checkout -b $branchname
 # load data from remote branch
 git pull origin master
 
-# upload to remote
-git push 
 
 # check the status of git?
 git status
 
-# check 
-git 
+# check commit log
+git log
+
+# add
+git add -A
+git add file_name
+
+# commit
+git commit -m "content"
+
+# upload to remote
+git push 
+
