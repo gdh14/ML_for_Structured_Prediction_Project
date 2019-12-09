@@ -2,7 +2,7 @@
 # https://github.com/wkentaro/pytorch-fcn/blob/master/torchfcn/utils.py
 
 import numpy as np
-
+import torch
 
 class runningScore(object):
     def __init__(self, n_classes):
@@ -10,6 +10,9 @@ class runningScore(object):
         self.confusion_matrix = np.zeros((n_classes, n_classes)).astype(np.int32)
 
     def _fast_hist(self, label_true, label_pred, n_class):
+        """
+        
+        """
         mask = (label_true >= 0) & (label_true < n_class)
         hist = np.bincount(n_class * label_true[mask].astype(int) + label_pred[mask], minlength=n_class ** 2).reshape(n_class, n_class)
         return hist
@@ -53,7 +56,7 @@ class averageMeter(object):
     """Computes and stores the average and current value"""
 
     def __init__(self):
-        self.reset()
+        self.reset(meter_type)
 
     def reset(self):
         self.val = 0
