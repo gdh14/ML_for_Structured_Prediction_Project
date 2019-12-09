@@ -7,6 +7,7 @@ import random
 import argparse
 import numpy as np
 
+from datetime import datetime
 from torch.utils import data
 from tqdm import tqdm
 
@@ -70,8 +71,8 @@ def train(cfg, writer, logger):
         v_loader, batch_size=cfg["training"]["batch_size"], num_workers=cfg["training"]["n_workers"]
     )
 
-    logger.info("{} data for training".format(len(t_loader)))
-    logger.info("{} data for validation".format(len(v_loader)))
+    print("{} data for training".format(len(t_loader)))
+    print("{} data for validation".format(len(v_loader)))
 
     # Setup Metrics    
     running_metrics_val = runningScore(n_classes)
@@ -121,6 +122,7 @@ def train(cfg, writer, logger):
 
     while i <= cfg["training"]["train_iters"] and flag:
         train_loss_meter.reset()
+
         for (images, labels) in train_loader:
             batch_size = images.size(0)
             i += 1
@@ -138,8 +140,8 @@ def train(cfg, writer, logger):
             loss.backward()
             optimizer.step()
 
-            time_meter.update(time.time() - start_ts)
             train_loss_meter.update(loss.item(), batch_size)
+            time_meter.update(time.time() - start_ts)
 
             if (i + 1) % cfg["training"]["print_interval"] == 0:
                 fmt_str = "Iter [{:d}/{:d}]  Loss: {:.4f}  Time/Image: {:.4f}"
@@ -208,7 +210,6 @@ def train(cfg, writer, logger):
                 flag = False
                 break
 
-
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="config")
     parser.add_argument(
@@ -224,7 +225,7 @@ if __name__ == "__main__":
     with open(args.config) as fp:
         cfg = yaml.load(fp)
 
-    run_id = random.randint(1, 100000)
+    run_id = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
     logdir = os.path.join("runs", os.path.basename(args.config)[:-4], str(run_id))
     writer = SummaryWriter(log_dir=logdir)
 
