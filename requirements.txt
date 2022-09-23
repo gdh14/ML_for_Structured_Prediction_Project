@@ -5,6 +5,6 @@ torchvision==0.2.1
 tqdm==4.28.1
 torch
 pydensecrf
-protobuf==3.8.0
+protobuf==3.18.3
 tensorboardX
 nvidia-ml-py3
